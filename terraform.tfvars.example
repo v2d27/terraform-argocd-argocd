@@ -1,0 +1,177 @@
+# terraform.tfvars.example
+# Copy this file to terraform.tfvars and customize for your environment
+
+# =============================================================================
+# REQUIRED VARIABLES - Must be set
+# =============================================================================
+
+# Application Configuration
+app_name        = "my-web-app"
+app_namespace   = "production"
+project_name    = "web-applications"
+repo_url        = "git@github.com:myorg/kustomize-configs.git"
+kustomize_path  = "overlays/production/web-app"
+
+# =============================================================================
+# AUTHENTICATION CONFIGURATION - Choose one method
+# =============================================================================
+
+# Option 1: SSH Authentication (Default - Most Common)
+repo_auth_type      = "ssh"
+git_ssh_private_key = "-----BEGIN OPENSSH PRIVATE KEY-----\n...\n-----END OPENSSH PRIVATE KEY-----"
+# Or load from file: git_ssh_private_key = file("~/.ssh/argocd_deploy_key")
+
+# Option 2: HTTPS Authentication with Personal Access Token
+# repo_auth_type = "https"
+# git_username   = "myusername"
+# git_password   = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Option 3: GitHub App Authentication (Enterprise)
+# repo_auth_type                = "github_app"
+# github_app_id                = "123456"
+# github_app_installation_id   = "12345678"
+# github_app_private_key       = "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+# github_enterprise_base_url   = "https://api.github.enterprise.corp"
+
+# Option 4: Token Authentication
+# repo_auth_type = "token"
+# git_password   = "your-access-token-here"
+
+# =============================================================================
+# OPTIONAL CONFIGURATION - Customize as needed
+# =============================================================================
+
+# Repository Configuration
+repo_target_revision         = "main"
+insecure_ignore_host_key    = false  # Set to true only for testing
+enable_git_lfs              = false
+
+# Destination Configuration
+destination_server = "https://kubernetes.default.svc"
+argocd_namespace  = "argocd"
+
+# Project Configuration
+project_description = "Production web applications managed by ArgoCD"
+project_source_repos = [
+  "git@github.com:myorg/shared-configs.git",
+  "https://charts.bitnami.com/bitnami"
+]
+project_destinations = [
+  {
+    server    = "https://prod-cluster-2.k8s.corp"
+    namespace = "production"
+  }
+]
+
+# Kustomize Configuration
+kustomize_name_prefix = "prod-"
+kustomize_name_suffix = ""
+kustomize_images = [
+  "web-app=registry.corp/web-app:v2.1.0",
+  "nginx=nginx:1.21-alpine"
+]
+kustomize_common_labels = {
+  environment = "production"
+  team        = "web"
+  project     = "ecommerce"
+}
+kustomize_common_annotations = {
+  "deployment.kubernetes.io/revision" = "1"
+}
+kustomize_version = "v4.5.7"
+
+# Sync Policy Configuration
+sync_policy_automated    = true
+sync_policy_prune       = true
+sync_policy_self_heal   = true
+sync_policy_allow_empty = false
+
+sync_options = [
+  "CreateNamespace=true",
+  "ServerSideApply=true",
+  "RespectIgnoreDifferences=true"
+]
+
+# Sync Retry Configuration
+sync_retry_limit                = 5
+sync_retry_backoff_duration     = "5s"
+sync_retry_backoff_factor       = "2"
+sync_retry_backoff_max_duration = "3m"
+
+# Application Metadata
+app_labels = {
+  "app.kubernetes.io/name"       = "web-app"
+  "app.kubernetes.io/version"    = "v2.1.0"
+  "app.kubernetes.io/component"  = "frontend"
+  "app.kubernetes.io/part-of"    = "ecommerce-platform"
+  "platform.corp/team"           = "web"
+  "platform.corp/criticality"    = "high"
+}
+
+app_annotations = {
+  "argocd.argoproj.io/sync-wave" = "0"
+  "notifications.argoproj.io/subscribe.on-sync-succeeded.slack" = "web-team-alerts"
+  "platform.corp/documentation" = "https://docs.corp/web-app"
+  "platform.corp/runbook"      = "https://runbooks.corp/web-app"
+}
+
+# Advanced Configuration
+revision_history_limit = 10
+
+# Ignore differences for noisy fields
+ignore_differences = [
+  {
+    group = "apps"
+    kind  = "Deployment"
+    json_pointers = [
+      "/spec/replicas",
+      "/spec/template/spec/containers/0/image"
+    ]
+  },
+  {
+    group = ""
+    kind  = "Secret"
+    name  = "app-tls-secret"
+    jq_path_expressions = [".data"]
+  }
+]
+
+# Security Configuration
+project_cluster_resource_whitelist = [
+  {
+    group = "rbac.authorization.k8s.io"
+    kind  = "ClusterRole"
+  },
+  {
+    group = "rbac.authorization.k8s.io"
+    kind  = "ClusterRoleBinding"
+  }
+]
+
+project_namespace_resource_blacklist = [
+  {
+    group = "networking.k8s.io"
+    kind  = "NetworkPolicy"
+  }
+]
+
+# =============================================================================
+# ENVIRONMENT-SPECIFIC EXAMPLES
+# =============================================================================
+
+# Development Environment Example
+# app_name                = "web-app-dev"
+# app_namespace           = "development"
+# sync_policy_automated   = false  # Manual sync for dev
+# sync_policy_prune      = false  # Don't auto-delete in dev
+# sync_policy_self_heal  = false  # Allow manual changes
+# revision_history_limit = 3      # Lower history for dev
+
+# Staging Environment Example
+# app_name                = "web-app-staging"
+# app_namespace           = "staging"
+# sync_policy_prune      = false  # Don't auto-delete in staging
+# sync_retry_limit       = 3      # Faster feedback in staging
+
+# Production Environment Example (Current Configuration Above)
+# Includes all security and reliability features enabled

@@ -1,0 +1,243 @@
+argocd_project (Resource)
+Manages projects within ArgoCD.
+
+Example Usage
+resource "argocd_project" "myproject" {
+  metadata {
+    name      = "myproject"
+    namespace = "argocd"
+    labels = {
+      acceptance = "true"
+    }
+    annotations = {
+      "this.is.a.really.long.nested.key" = "yes, really!"
+    }
+  }
+
+  spec {
+    description = "simple project"
+
+    source_namespaces = ["argocd"]
+    source_repos      = ["*"]
+
+    destination {
+      server    = "https://kubernetes.default.svc"
+      namespace = "default"
+    }
+    destination {
+      server    = "https://kubernetes.default.svc"
+      namespace = "foo"
+    }
+    destination {
+      name      = "anothercluster"
+      namespace = "bar"
+    }
+
+    cluster_resource_blacklist {
+      group = "*"
+      kind  = "*"
+    }
+    cluster_resource_whitelist {
+      group = "rbac.authorization.k8s.io"
+      kind  = "ClusterRoleBinding"
+    }
+    cluster_resource_whitelist {
+      group = "rbac.authorization.k8s.io"
+      kind  = "ClusterRole"
+    }
+
+    namespace_resource_blacklist {
+      group = "networking.k8s.io"
+      kind  = "Ingress"
+    }
+    namespace_resource_whitelist {
+      group = "*"
+      kind  = "*"
+    }
+
+    orphaned_resources {
+      warn = true
+
+      ignore {
+        group = "apps/v1"
+        kind  = "Deployment"
+        name  = "ignored1"
+      }
+
+      ignore {
+        group = "apps/v1"
+        kind  = "Deployment"
+        name  = "ignored2"
+      }
+    }
+
+    role {
+      name = "testrole"
+      policies = [
+        "p, proj:myproject:testrole, applications, override, myproject/*, allow",
+        "p, proj:myproject:testrole, applications, sync, myproject/*, allow",
+        "p, proj:myproject:testrole, clusters, get, myproject/*, allow",
+        "p, proj:myproject:testrole, repositories, create, myproject/*, allow",
+        "p, proj:myproject:testrole, repositories, delete, myproject/*, allow",
+        "p, proj:myproject:testrole, repositories, update, myproject/*, allow",
+        "p, proj:myproject:testrole, logs, get, myproject/*, allow",
+        "p, proj:myproject:testrole, exec, create, myproject/*, allow",
+      ]
+    }
+    role {
+      name = "anotherrole"
+      policies = [
+        "p, proj:myproject:testrole, applications, get, myproject/*, allow",
+        "p, proj:myproject:testrole, applications, sync, myproject/*, deny",
+      ]
+    }
+
+    sync_window {
+      kind         = "allow"
+      applications = ["api-*"]
+      clusters     = ["*"]
+      namespaces   = ["*"]
+      duration     = "3600s"
+      schedule     = "10 1 * * *"
+      manual_sync  = true
+    }
+    sync_window {
+      kind         = "deny"
+      applications = ["foo"]
+      clusters     = ["in-cluster"]
+      namespaces   = ["default"]
+      duration     = "12h"
+      schedule     = "22 1 5 * *"
+      manual_sync  = false
+      timezone     = "Europe/London"
+    }
+
+    signature_keys = [
+      "4AEE18F83AFDEB23",
+      "07E34825A909B250"
+    ]
+  }
+}
+Copy
+Schema
+Required
+metadata (Block List, Min: 1, Max: 1) Standard Kubernetes object metadata. For more info see the Kubernetes reference. (see below for nested schema)
+spec (Block List, Min: 1, Max: 1) ArgoCD AppProject spec. (see below for nested schema)
+Read-Only
+id (String) The ID of this resource.
+
+Nested Schema for metadata
+Optional:
+
+annotations (Map of String) An unstructured key value map stored with the appprojects.argoproj.io that may be used to store arbitrary metadata. More info: http://kubernetes.io/docs/user-guide/annotations
+labels (Map of String) Map of string keys and values that can be used to organize and categorize (scope and select) the appprojects.argoproj.io. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels
+name (String) Name of the appprojects.argoproj.io, must be unique. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names
+namespace (String) Namespace of the appprojects.argoproj.io, must be unique. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+Read-Only:
+
+generation (Number) A sequence number representing a specific generation of the desired state.
+resource_version (String) An opaque value that represents the internal version of this appprojects.argoproj.io that can be used by clients to determine when appprojects.argoproj.io has changed. Read more: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+uid (String) The unique in time and space value for this appprojects.argoproj.io. More info: http://kubernetes.io/docs/user-guide/identifiers#uids
+
+Nested Schema for spec
+Required:
+
+destination (Block Set, Min: 1) Destinations available for deployment. (see below for nested schema)
+source_repos (List of String) List of repository URLs which can be used for deployment. Can be set to ["*"] to allow all configured repositories configured in ArgoCD.
+Optional:
+
+cluster_resource_blacklist (Block Set) Blacklisted cluster level resources. (see below for nested schema)
+cluster_resource_whitelist (Block Set) Whitelisted cluster level resources. (see below for nested schema)
+description (String) Project description.
+destination_service_account (Block Set) Service accounts to be impersonated for the application sync operation for each destination. (see below for nested schema)
+namespace_resource_blacklist (Block Set) Blacklisted namespace level resources. (see below for nested schema)
+namespace_resource_whitelist (Block Set) Whitelisted namespace level resources. (see below for nested schema)
+orphaned_resources (Block List, Max: 1) Settings specifying if controller should monitor orphaned resources of apps in this project. (see below for nested schema)
+role (Block List) User defined RBAC roles associated with this project. (see below for nested schema)
+signature_keys (List of String) List of PGP key IDs that commits in Git must be signed with in order to be allowed for sync.
+source_namespaces (Set of String) List of namespaces that application resources are allowed to be created in.
+sync_window (Block List) Settings controlling when syncs can be run for apps in this project. (see below for nested schema)
+
+Nested Schema for spec.destination
+Required:
+
+namespace (String) Target namespace for applications' resources.
+Optional:
+
+name (String) Name of the destination cluster which can be used instead of server.
+server (String) URL of the target cluster and must be set to the Kubernetes control plane API.
+
+Nested Schema for spec.cluster_resource_blacklist
+Optional:
+
+group (String) The Kubernetes resource Group to match for.
+kind (String) The Kubernetes resource Kind to match for.
+
+Nested Schema for spec.cluster_resource_whitelist
+Optional:
+
+group (String) The Kubernetes resource Group to match for.
+kind (String) The Kubernetes resource Kind to match for.
+
+Nested Schema for spec.destination_service_account
+Required:
+
+default_service_account (String) Used for impersonation during the sync operation
+server (String) Specifies the URL of the target cluster's Kubernetes control plane API.
+Optional:
+
+namespace (String) Specifies the target namespace for the application's resources.
+
+Nested Schema for spec.namespace_resource_blacklist
+Optional:
+
+group (String) The Kubernetes resource Group to match for.
+kind (String) The Kubernetes resource Kind to match for.
+
+Nested Schema for spec.namespace_resource_whitelist
+Optional:
+
+group (String) The Kubernetes resource Group to match for.
+kind (String) The Kubernetes resource Kind to match for.
+
+Nested Schema for spec.orphaned_resources
+Optional:
+
+ignore (Block Set) (see below for nested schema)
+warn (Boolean) Whether a warning condition should be created for apps which have orphaned resources.
+
+Nested Schema for spec.orphaned_resources.ignore
+Optional:
+
+group (String) The Kubernetes resource Group to match for.
+kind (String) The Kubernetes resource Kind to match for.
+name (String) The Kubernetes resource name to match for.
+
+Nested Schema for spec.role
+Required:
+
+name (String) Name of the role.
+policies (List of String) List of casbin formatted strings that define access policies for the role in the project. For more information, see the ArgoCD RBAC reference.
+Optional:
+
+description (String) Description of the role.
+groups (List of String) List of OIDC group claims bound to this role.
+
+Nested Schema for spec.sync_window
+Optional:
+
+applications (List of String) List of applications that the window will apply to.
+clusters (List of String) List of clusters that the window will apply to.
+duration (String) Amount of time the sync window will be open.
+kind (String) Defines if the window allows or blocks syncs, allowed values are allow or deny.
+manual_sync (Boolean) Enables manual syncs when they would otherwise be blocked.
+namespaces (List of String) List of namespaces that the window will apply to.
+schedule (String) Time the window will begin, specified in cron format.
+timezone (String) Timezone that the schedule will be evaluated in.
+Import
+Import is supported using the following syntax:
+
+# Projects can be imported using the project name.
+
+# Example:
+terraform import argocd_project.myproject myproject
