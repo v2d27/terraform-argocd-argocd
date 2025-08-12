@@ -1,18 +1,17 @@
 # Terraform ArgoCD Module
 
-A comprehensive Terraform module for creating and managing ArgoCD applications, projects, and repositories with support for multiple authentication methods and advanced configuration options.
+A Terraform module for creating and managing ArgoCD applications, projects, and repositories with support for multiple authentication methods and advanced configuration options.
+
+***Note: This module is used to manage ArgoCD, not deploy ArgoCD***
 
 ## Features
 
-- ✅ **Multiple Authentication Types**: SSH, HTTPS, GitHub App, and Token-based authentication
-- ✅ **Comprehensive Project Management**: Create scoped ArgoCD projects with advanced RBAC
-- ✅ **Advanced Kustomize Support**: Full Kustomize configuration including patches, images, and labels
-- ✅ **Flexible Sync Policies**: Automated and manual sync with retry mechanisms
-- ✅ **Security Best Practices**: Secure defaults with validation and proper secret handling
-- ✅ **Enterprise Ready**: Support for GitHub Enterprise and advanced organizational features
-- ✅ **Observability**: Comprehensive outputs for monitoring and integration
-
-## Requirements
+- **Multiple Authentication Types**: SSH, HTTPS, GitHub App, and Token-based authentication
+- **Project Management**: Create scoped ArgoCD projects with advanced RBAC
+- **Advanced Kustomize Support**: Full Kustomize configuration including patches, images, and labels
+- **Flexible Sync Policies**: Automated and manual sync with retry mechanisms
+- **Security Best Practices**: Secure defaults with validation and proper secret handling
+- **Enterprise Ready**: Support for GitHub Enterprise and advanced organizational features
 
 
 

@@ -5,7 +5,7 @@ All notable changes to this terraform-argocd-module will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-08-12
+## [1.0.0] - 2025-08-12
 
 ### 🚀 Major Features Added
 
@@ -146,12 +146,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI/CD Pipelines**: Validation and deployment status
 - **Documentation Systems**: Automatic documentation generation
 - **Audit Systems**: Comprehensive configuration tracking
-
-## [1.0.0] - 2025-08-01
-
-### Initial Release
-- Basic ArgoCD application creation
-- SSH authentication support
-- Simple Kustomize configuration
-- Basic sync policy support
-- Single repository per project
