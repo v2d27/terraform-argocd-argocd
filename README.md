@@ -1,5 +1,4 @@
 # Terraform ArgoCD Module
-
 A Terraform module for creating and managing ArgoCD applications, projects, and repositories with support for multiple authentication methods and advanced configuration options.
 
 ***Note: This module is used to manage ArgoCD, not deploy ArgoCD***
@@ -14,12 +13,16 @@ A Terraform module for creating and managing ArgoCD applications, projects, and 
 - **Enterprise Ready**: Support for GitHub Enterprise and advanced organizational features
 
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.12.2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.12.2 |
 | [argoproj-labs/argocd](https://registry.terraform.io/providers/argoproj-labs/argocd/latest) | >= 7.10.0 |
 
 ## Authentication Types Supported
@@ -225,7 +228,7 @@ For a complete list of variables, see [variables.tf](./variables.tf).
 | `repository_connection_status` | Connection status of the repository |
 | `application_url` | Relative URL to view the application in ArgoCD UI |
 
-For a complete list of outputs, see [outputs.tf](./outputs.tf).
+For a complete list of outputs, see [outputs.tf](https://github.com/v2d27/terraform-argocd-argocd/blob/main/outputs.tf).
 
 ## Security Considerations
 
@@ -246,7 +249,7 @@ For a complete list of outputs, see [outputs.tf](./outputs.tf).
 
 ## Examples
 
-See [examples.tf](./examples.tf) for comprehensive usage examples including:
+See [examples.tf](https://github.com/v2d27/terraform-argocd-argocd/blob/main/docs/examples/examples.tf) for comprehensive usage examples including:
 - SSH authentication setup
 - HTTPS with Personal Access Token
 - GitHub App authentication for enterprises
@@ -263,11 +266,11 @@ See [examples.tf](./examples.tf) for comprehensive usage examples including:
 
 ## License
 
-This module is licensed under the Apache License 2.0. See [LICENSE](./LICENSE) for details.
+This module is licensed under the Apache License 2.0. See [LICENSE](https://github.com/v2d27/terraform-argocd-argocd?tab=Apache-2.0-1-ov-file) for details.
 
 ## Support
 
 For issues and questions:
-1. Check the [examples](./examples.tf) for common patterns
+1. Check the [examples](https://github.com/v2d27/terraform-argocd-argocd/blob/main/docs/examples/examples.tf) for common patterns
 2. Review the ArgoCD documentation for provider-specific details
 3. Open an issue with detailed information about your use case
