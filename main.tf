@@ -69,18 +69,17 @@ resource "argocd_repository" "app_repo" {
   project = argocd_project.app_project.metadata[0].name
 
   # SSH Authentication
-  ssh_private_key          = local.repo_config.ssh_private_key
-  insecure_ignore_host_key = var.repo_auth_type == "ssh" ? var.insecure_ignore_host_key : null
+  ssh_private_key          = try(local.repo_config.ssh_private_key, null)
 
   # HTTPS/Token Authentication
-  username = local.repo_config.username
-  password = local.repo_config.password
+  username = try(local.repo_config.username, null)
+  password = try(local.repo_config.password, null)
 
   # GitHub App Authentication
-  githubapp_id                     = local.repo_config.githubapp_id
-  githubapp_installation_id        = local.repo_config.githubapp_installation_id
-  githubapp_private_key           = local.repo_config.githubapp_private_key
-  githubapp_enterprise_base_url   = local.repo_config.githubapp_enterprise_base_url
+  githubapp_id                     = try(local.repo_config.githubapp_id, null)
+  githubapp_installation_id        = try(local.repo_config.githubapp_installation_id, null)
+  githubapp_private_key           = try(local.repo_config.githubapp_private_key, null)
+  githubapp_enterprise_base_url   = try(local.repo_config.githubapp_enterprise_base_url, null)
 
   # Additional repository settings
   enable_lfs = var.enable_git_lfs
